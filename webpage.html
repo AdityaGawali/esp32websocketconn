@@ -25,6 +25,11 @@
  
                     alert("Connection closed");
                };
+          
+               ws.onmessage = function(e){
+                   var server_message = e.data;
+                   console.log("Recieved from server : " + server_message);
+              }
          }
  
          function CloseWebsocket(){
