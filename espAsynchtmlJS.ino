@@ -1,4 +1,4 @@
-///Working code 
+///Working code
 #include "WiFi.h"
 #include "ESPAsyncWebServer.h"
 #include "SPIFFS.h"
@@ -6,8 +6,9 @@
 const char* ssid = "Ajinkya";
 const char* password = "ajinkya21";
 AsyncWebServer server(80);
-AsyncWebSocket ws("/test");
-
+AsyncWebSocket websocket("/socket");
+String input_data;
+int event_flag = 0;
 void setup()
 {
   Serial.begin(115200);
@@ -27,12 +28,12 @@ void setup()
   Serial.print("Connected with IP : ");
   Serial.println(WiFi.localIP());
 
-  ws.onEvent(onWsEvent);
-  server.addHandler(&ws);
+  websocket.onEvent(onWsEvent);
+  server.addHandler(&websocket);
 
   server.on("/", HTTP_GET, [](AsyncWebServerRequest * request)
   {
-    request->send(SPIFFS,"/webpage.html" , "text/html"); 
+    request->send(SPIFFS, "/webpage.html" , "text/html");
   });
   server.begin();
 }
@@ -50,17 +51,40 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   }
   else if (type == WS_EVT_DATA)
   {
+      event_flag=1;
+
+    char input_buffer[len+1]={};
     Serial.print("Data received: ");
-    for (int i = 0; i < len; i++)
+     
+    for (int i = 0; i <len; i++)
     {
-      Serial.print((char) data[i]);
+      input_buffer[i] = (char)data[i];
     }
+    
+    input_data = String(input_buffer);
+    input_data.toLowerCase();
+    Serial.print(input_data);
     Serial.println();
   }
 }
 
 void loop()
 {
+ if((input_data == "slow")&&(event_flag ==1))
+ {
+  Serial.println("10A code here");
+  event_flag = 0;
+ }
+  else if((input_data == "medium")&&(event_flag ==1))
+ {
+  Serial.println("22A code here");
+  event_flag = 0;
+ }
+ else if((input_data == "fast")&&(event_flag ==1))
+ {
+  Serial.println("45A code here");
+  event_flag = 0;
+ }
 
-
+  
 }
