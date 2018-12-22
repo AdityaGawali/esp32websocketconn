@@ -3,8 +3,8 @@
 #include "ESPAsyncWebServer.h"
 #include "SPIFFS.h"
 
-const char* ssid = "Ajinkya";
-const char* password = "ajinkya21";
+const char* ssid = "Shambhavi";
+const char* password = "12345679";
 AsyncWebServer server(80);
 AsyncWebSocket websocket("/socket");
 String input_data;
@@ -74,16 +74,19 @@ void loop()
  {
   Serial.println("10A code here");
   event_flag = 0;
+  dacWrite(25,0);
  }
   else if((input_data == "medium")&&(event_flag ==1))
  {
   Serial.println("22A code here");
   event_flag = 0;
+  dacWrite(25,128);
  }
  else if((input_data == "fast")&&(event_flag ==1))
  {
   Serial.println("45A code here");
   event_flag = 0;
+ dacWrite(25,255);
  }
 
   
