@@ -3,8 +3,8 @@
 #include "ESPAsyncWebServer.h"
 #include "SPIFFS.h"
 
-const char* ssid = "Shambhavi";
-const char* password = "12345679";
+const char* ssid = "Ajinkya";
+const char* password = "ajinkya21";
 AsyncWebServer server(80);
 AsyncWebSocket websocket("/socket");
 String input_data;
