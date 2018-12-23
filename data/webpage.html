@@ -6,24 +6,32 @@
  
          var ws = null;
  
-         function OpenWebsocket() {
+         function OpenWebsocket() 
+         {
  
                ws = new WebSocket("ws://192.168.0.102/socket");
  
-               ws.onopen = function() {
+               ws.onopen = function() 
+               {
                     document.getElementById("inputText").disabled = false;
                     document.getElementById("sendButton").disabled = false;
                     document.getElementById("connectButton").disabled = true;
                     document.getElementById("disconnectButton").disabled = false;
                };
  
-               ws.onclose = function() {
+               ws.onclose = function() 
+               {
                     document.getElementById("inputText").disabled = true;
                     document.getElementById("sendButton").disabled = true;
                     document.getElementById("connectButton").disabled = false;
                     document.getElementById("disconnectButton").disabled = true;
+                    document.getElementById("display").innerHTML  = "Not connected";
  
                     alert("Connection closed");
+               };
+               ws.onmessage = function(message) 
+               {
+               document.getElementById("display").innerHTML  = "Count: " + message.data;
                };
          }
  
@@ -51,6 +59,9 @@
       <div align="center">
          <input type = "text" disabled = "true" id = "inputText"></input>
          <button onclick = "SendData()"  disabled = "true" id = "sendButton">SEND</button>
+      </div>
+      <div align="center">
+         <p id = "display">Not connected</p>
       </div>
    </body>
 </html>

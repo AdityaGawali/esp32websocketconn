@@ -5,10 +5,15 @@
 
 const char* ssid = "Ajinkya";
 const char* password = "ajinkya21";
+
 AsyncWebServer server(80);
+AsyncWebSocketClient * globalClient = NULL;
 AsyncWebSocket websocket("/socket");
+
 String input_data;
 int event_flag = 0;
+
+int count = 0 ;
 void setup()
 {
   Serial.begin(115200);
@@ -43,11 +48,13 @@ void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventT
   if (type == WS_EVT_CONNECT)
   {
     Serial.println("Websocket client connection received");
+    globalClient = client;
   }
   else if (type == WS_EVT_DISCONNECT)
   {
     Serial.println("Client disconnected");
     Serial.println("-----------------------");
+    globalClient = NULL;
   }
   else if (type == WS_EVT_DATA)
   {
@@ -88,6 +95,13 @@ void loop()
   event_flag = 0;
  dacWrite(25,255);
  }
+ if(globalClient != NULL && globalClient->status() == WS_CONNECTED)
+ {
+  String randomNumber = String(random(0,20));
+  globalClient->text(randomNumber);
+  Serial.println(randomNumber);
+}
+delay(2000);
 
   
 }
