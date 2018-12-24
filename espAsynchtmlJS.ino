@@ -2,7 +2,7 @@
 #include "WiFi.h"
 #include "ESPAsyncWebServer.h"
 #include "SPIFFS.h"
-
+ 
 const char* ssid = "Ajinkya";
 const char* password = "ajinkya21";
 
@@ -93,15 +93,15 @@ void loop()
  {
   Serial.println("45A code here");
   event_flag = 0;
- dacWrite(25,255);
+  dacWrite(25,255);
  }
- if(globalClient != NULL && globalClient->status() == WS_CONNECTED)
- {
-  String randomNumber = String(random(0,20));
-  globalClient->text(randomNumber);
-  Serial.println(randomNumber);
-}
-delay(2000);
+// if(globalClient != NULL && globalClient->status() == WS_CONNECTED)
+// {
+//  String randomNumber = String(random(0,20));
+//  globalClient->text(randomNumber);
+//  //Serial.println(randomNumber);
+//}
+//delay(2000);
 
   
 }

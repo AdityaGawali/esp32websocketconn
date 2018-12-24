@@ -9,23 +9,34 @@
          function OpenWebsocket() 
          {
  
-               ws = new WebSocket("ws://192.168.0.102/socket");
+               ws = new WebSocket("ws://192.168.0.101/socket");
  
                ws.onopen = function() 
                {
                     document.getElementById("inputText").disabled = false;
                     document.getElementById("sendButton").disabled = false;
+
+                    document.getElementById("slowbtn").disabled=false;
+                    document.getElementById("mediumbtn").disabled=false;
+                    document.getElementById("fastbtn").disabled=false;
+
                     document.getElementById("connectButton").disabled = true;
                     document.getElementById("disconnectButton").disabled = false;
+                    document.getElementById("CurrentMode").innerHTML  = "Current Mode: Connected";
                };
  
                ws.onclose = function() 
                {
                     document.getElementById("inputText").disabled = true;
                     document.getElementById("sendButton").disabled = true;
+
+                    document.getElementById("slowbtn").disabled=true;
+                    document.getElementById("mediumbtn").disabled=true;
+                    document.getElementById("fastbtn").disabled=true;
+
                     document.getElementById("connectButton").disabled = false;
                     document.getElementById("disconnectButton").disabled = true;
-                    document.getElementById("display").innerHTML  = "Not connected";
+                    document.getElementById("CurrentMode").innerHTML  = "Current Mode: Not Connected";
  
                     alert("Connection closed");
                };
@@ -44,6 +55,28 @@
             ws.send(textToSend);
             document.getElementById("inputText").value = "";
 
+
+         }
+         function SendSlowData(){
+            var textToSend = "slow";
+            ws.send(textToSend);
+            document.getElementById("inputText").value = "";
+            document.getElementById("CurrentMode").innerHTML  = "Current Mode: SLOW";
+
+         }
+         function SendMediumData(){
+            var textToSend = "medium";
+            ws.send(textToSend);
+            document.getElementById("inputText").value = "";
+            document.getElementById("CurrentMode").innerHTML  = "Current Mode: MEDIUM";
+
+         }
+         function SendFastData(){
+            var textToSend = "fast";
+            ws.send(textToSend);
+            document.getElementById("inputText").value = "";
+            document.getElementById("CurrentMode").innerHTML  = "Current Mode: FAST";
+
          }
  
       </script>
@@ -52,16 +85,24 @@
  
    <body>
       <div align="center">
-         <button onclick = "OpenWebsocket()" id = "connectButton">CONNECT</button>
-         <button onclick = "CloseWebsocket()" disabled = "true" id = "disconnectButton">DISCONNECT</button>
+         <button style="margin: 5px;" onclick = "OpenWebsocket()" id = "connectButton">CONNECT</button>
+         <button style="margin:5px;" onclick = "CloseWebsocket()" disabled = "true" id = "disconnectButton">DISCONNECT</button>
       </div>
  
       <div align="center">
-         <input type = "text" disabled = "true" id = "inputText"></input>
-         <button onclick = "SendData()"  disabled = "true" id = "sendButton">SEND</button>
+         <input style="margin:5px;" type = "text" disabled = "true" id = "inputText"></input>
+
+         <button style="margin:5px;" onclick = "SendData()"  disabled = "true" id = "sendButton">SEND</button>
       </div>
       <div align="center">
-         <p id = "display">Not connected</p>
+         <button style="margin:5px;" onclick = "SendSlowData()" disabled = "true" id ="slowbtn">SLOW</button>
+         <button style="margin:5px;" onclick = "SendMediumData()" disabled = "true" id ="mediumbtn">MEDIUM</button>
+         <button style="margin:5px;" onclick = "SendFastData()" disabled = "true" id ="fastbtn">FAST</button>
+
+      </div>
+      <div align="center">
+         <p id = "CurrentMode">Current Mode: Not connected</p>
+         
       </div>
    </body>
 </html>
