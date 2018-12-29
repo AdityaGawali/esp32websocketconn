@@ -62,6 +62,11 @@
             ws.send(textToSend);
             document.getElementById("inputText").value = "";
             document.getElementById("CurrentMode").innerHTML  = "Current Mode: SLOW";
+            document.getElementById("slowbtn").disabled = true;
+            document.getElementById("mediumbtn").disabled = false;
+            document.getElementById("fastbtn").disabled = false;
+
+
 
          }
          function SendMediumData(){
@@ -69,6 +74,10 @@
             ws.send(textToSend);
             document.getElementById("inputText").value = "";
             document.getElementById("CurrentMode").innerHTML  = "Current Mode: MEDIUM";
+            document.getElementById("slowbtn").disabled = false;
+            document.getElementById("mediumbtn").disabled = true;
+            document.getElementById("fastbtn").disabled = false;
+
 
          }
          function SendFastData(){
@@ -76,6 +85,10 @@
             ws.send(textToSend);
             document.getElementById("inputText").value = "";
             document.getElementById("CurrentMode").innerHTML  = "Current Mode: FAST";
+            document.getElementById("slowbtn").disabled = false;
+            document.getElementById("mediumbtn").disabled = false;
+            document.getElementById("fastbtn").disabled = true;
+
 
          }
  
