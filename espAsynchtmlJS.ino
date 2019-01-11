@@ -50,7 +50,8 @@ void setup()
     request->send(SPIFFS, "/webpage.html" , "text/html");
   });
   server.begin();
-  //MDNS.addService("http", "tcp", 80);
+  MDNS.addService("http", "tcp", 80);
+  MDNS.addService("ws", "tcp", 80);
 }
 void onWsEvent(AsyncWebSocket * server, AsyncWebSocketClient * client, AwsEventType type, void * arg, uint8_t *data, size_t len)
 {
