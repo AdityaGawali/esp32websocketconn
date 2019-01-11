@@ -9,7 +9,8 @@
          function OpenWebsocket() 
          {
  
-               ws = new WebSocket("ws://192.168.0.101/socket");
+               ws = new WebSocket("ws://192.168.0.104/socket");
+               //ws = new WebSocket("ws://esp32.local/socket");
  
                ws.onopen = function() 
                {
@@ -42,7 +43,7 @@
                };
                ws.onmessage = function(message) 
                {
-               document.getElementById("display").innerHTML  = "Count: " + message.data;
+               document.getElementById("CurrentMode").innerHTML  = "CurrentMode: " + message.data;
                };
          }
  
@@ -61,21 +62,18 @@
             var textToSend = "slow";
             ws.send(textToSend);
             document.getElementById("inputText").value = "";
-            document.getElementById("CurrentMode").innerHTML  = "Current Mode: SLOW";
-
          }
          function SendMediumData(){
             var textToSend = "medium";
             ws.send(textToSend);
             document.getElementById("inputText").value = "";
-            document.getElementById("CurrentMode").innerHTML  = "Current Mode: MEDIUM";
-
+            
          }
          function SendFastData(){
             var textToSend = "fast";
             ws.send(textToSend);
             document.getElementById("inputText").value = "";
-            document.getElementById("CurrentMode").innerHTML  = "Current Mode: FAST";
+            
 
          }
  

@@ -2,7 +2,7 @@
 SPIClass * vspi = NULL;
 static const int spiClk = 1000000;
 
-uint8_t data = 0b01010101; // junk data to illustrate usage
+uint8_t data1 = 0b00000000; // junk data to illustrate usage
 uint8_t received_data;
 
 void setup() 
@@ -16,11 +16,17 @@ void setup()
   //hspi->begin(0, 2, 4, 33); //SCLK, MISO, MOSI, SS
 
    pinMode(5, OUTPUT); 
+   Serial.begin(115200);
 }
 
 void loop() 
 {
-   received_data = vspiCommand(data);
+   received_data = vspiCommand(data1);
+   Serial.print(received_data);
+   Serial.print("\t");
+   Serial.println(data1);
+   delay(1000);
+   data1 = data1 + 1;
 }
 
 uint8_t vspiCommand(uint8_t send_data) 
