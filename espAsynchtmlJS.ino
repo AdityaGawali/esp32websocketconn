@@ -6,8 +6,8 @@
 
 
 
-const char* ssid = "Ajinkya";
-const char* password = "ajinkya21";
+const char* ssid = "aditya";
+const char* password = "aditya135";
 
 AsyncWebServer server(80);
 AsyncWebSocketClient * globalClient = NULL;

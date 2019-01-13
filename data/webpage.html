@@ -5,11 +5,12 @@
       <script type = "text/javascript">
  
          var ws = null;
+         var ip = "192.168.43.61"
  
          function OpenWebsocket() 
          {
  
-               ws = new WebSocket("ws://192.168.0.104/socket");
+               ws = new WebSocket("ws://" + ip + "/socket");
                //ws = new WebSocket("ws://esp32.local/socket");
  
                ws.onopen = function() 
@@ -55,6 +56,9 @@
             var textToSend = document.getElementById("inputText").value;
             ws.send(textToSend);
             document.getElementById("inputText").value = "";
+            document.getElementById("slowbtn").disabled = false;
+            document.getElementById("mediumbtn").disabled = false;
+            document.getElementById("fastbtn").disabled = false;
 
 
          }
