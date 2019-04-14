@@ -13,24 +13,18 @@ menu "Example Configuration"
             WiFi password (WPA or WPA2) for the example to use.
             Can be left blank if the network has no security set.
 
-    choice EXAMPLE_IP_MODE
-        prompt "IP Version"
-        help
-            Example can use either IPV4 or IPV6.
-
-        config EXAMPLE_IPV4
-            bool "IPV4"
-
-        config EXAMPLE_IPV6
-            bool "IPV6"
-
-    endchoice
-
-    config EXAMPLE_PORT
+    config PORT
         int "Port"
         range 0 65535
-        default 3333
+        default 9998
         help
             Local port the example server will listen on.
+
+    config DAC_PIN
+        int "Pin"
+        default 1
+        help 
+            1 : 25
+            2 : 26
 
 endmenu
