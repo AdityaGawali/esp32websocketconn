@@ -21,28 +21,23 @@
 #include "WebSocket_Task.h"
 
 
-#define PORT CONFIG_EXAMPLE_PORT
-
-// HTTP headers and web pages
 const static char http_html_hdr[] = "HTTP/1.1 200 OK\nContent-type: text/html\n\n";
 // embedded binary data
 extern const uint8_t webpage_html_start[] asm("_binary_webpage_html_start");
 extern const uint8_t webpage_html_end[]   asm("_binary_webpage_html_end");
 
 
-// Event group for inter-task communication
+//WebSocket frame receive queue
+QueueHandle_t WebSocket_rx_queue;
+static const char *TAG = "socket with server";
+
+
 static EventGroupHandle_t wifi_event_group;
 
 const int IPV4_GOTIP_BIT = BIT0;
 const int IPV6_GOTIP_BIT = BIT1;
 const int WIFI_CONNECTED_BIT = BIT0;
 
-static const char *TAG = "socket with server";
-
-
-
-//WebSocket frame receive queue
-QueueHandle_t WebSocket_rx_queue;
 
 void task_process_WebSocket( void *pvParameters ){
     (void)pvParameters;
@@ -59,7 +54,6 @@ void task_process_WebSocket( void *pvParameters ){
 
             //write frame inforamtion to UART
             printf("New Websocket frame. Length %d, payload %.*s \r\n", __RX_frame.payload_length, __RX_frame.payload_length, __RX_frame.payload);
-            //Data is present it __RX_frame.payload//
 
             //loop back frame
             WS_write_data(__RX_frame.payload, __RX_frame.payload_length);
@@ -71,8 +65,6 @@ void task_process_WebSocket( void *pvParameters ){
         }
     }
 }
-
-// Wifi event handler
 static esp_err_t event_handler(void *ctx, system_event_t *event)
 {
     switch (event->event_id) {
@@ -106,69 +98,64 @@ static esp_err_t event_handler(void *ctx, system_event_t *event)
     return ESP_OK;
 }
 
-	  
 static void http_server_netconn_serve(struct netconn *conn) 
 {
 
-	struct netbuf *inbuf;
-	char *buf;
-	u16_t buflen;
-	err_t err;
+    struct netbuf *inbuf;
+    char *buf;
+    u16_t buflen;
+    err_t err;
 
-	err = netconn_recv(conn, &inbuf);
+    err = netconn_recv(conn, &inbuf);
 
-	if (err == ERR_OK) 
-	{
-	  
-		netbuf_data(inbuf, (void**)&buf, &buflen);
-		
-		// extract the first line, with the request
-		char *first_line = strtok(buf, "\n");
-		
-		if(first_line) 
-		{
-			
-			// default page
-			if(strstr(first_line, "GET / ")) 
-			{
-				netconn_write(conn, http_html_hdr, sizeof(http_html_hdr) - 1, NETCONN_NOCOPY);
-				netconn_write(conn, webpage_html_start, webpage_html_end - webpage_html_start, NETCONN_NOCOPY);
+    if (err == ERR_OK) 
+    {
+      
+        netbuf_data(inbuf, (void**)&buf, &buflen);
+        
+        // extract the first line, with the request
+        char *first_line = strtok(buf, "\n");
+        
+        if(first_line) 
+        {
+            
+            // default page
+            if(strstr(first_line, "GET / ")) 
+            {
+                netconn_write(conn, http_html_hdr, sizeof(http_html_hdr) - 1, NETCONN_NOCOPY);
+                netconn_write(conn, webpage_html_start, webpage_html_end - webpage_html_start, NETCONN_NOCOPY);
 
-			}
-		}
-		else printf("Unkown request\n");
-	}
-	
-	// close the connection and free the buffer
-	netconn_close(conn);
-	netbuf_delete(inbuf);
+            }
+        }
+        else printf("Unkown request\n");
+    }
+    
+    // close the connection and free the buffer
+    netconn_close(conn);
+    netbuf_delete(inbuf);
 }
 
 static void http_server(void *pvParameters) {
-	
-	struct netconn *conn, *newconn;
-	err_t err;
-	conn = netconn_new(NETCONN_TCP);
-	netconn_bind(conn, NULL, 80);
-	netconn_listen(conn);
-	printf("HTTP Server listening...\n");
-	do {
-		err = netconn_accept(conn, &newconn);
-		printf("New client connected\n");
-		if (err == ERR_OK) {
-			http_server_netconn_serve(newconn);
-			netconn_delete(newconn);
-		}
-		vTaskDelay(1); //allows task to be pre-empted
-	} while(err == ERR_OK);
-	netconn_close(conn);
-	netconn_delete(conn);
-	printf("\n");
+    
+    struct netconn *conn, *newconn;
+    err_t err;
+    conn = netconn_new(NETCONN_TCP);
+    netconn_bind(conn, NULL, 80);
+    netconn_listen(conn);
+    printf("HTTP Server listening...\n");
+    do {
+        err = netconn_accept(conn, &newconn);
+        printf("New client connected\n");
+        if (err == ERR_OK) {
+            http_server_netconn_serve(newconn);
+            netconn_delete(newconn);
+        }
+        vTaskDelay(1); //allows task to be pre-empted
+    } while(err == ERR_OK);
+    netconn_close(conn);
+    netconn_delete(conn);
+    printf("\n");
 }
-
-
-
-// setup and start the wifi connection
 static void initialise_wifi(void)
 {
     tcpip_adapter_init();
@@ -190,34 +177,29 @@ static void initialise_wifi(void)
 }
 
 
-
-
-
-
-// Main application
-void app_main()
+void app_main(void)
 {
-	// disable the default wifi logging
-	esp_log_level_set("wifi", ESP_LOG_NONE);
 
-	nvs_flash_init();
-	initialise_wifi();
-	
-	
-	// wait for connection
-	printf("Waiting for connection to the wifi network...\n ");
-	xEventGroupWaitBits(wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
-	printf("Connected\n\n");
-	
-	// print the local IP address
-	tcpip_adapter_ip_info_t ip_info;
-	ESP_ERROR_CHECK(tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info));
-	printf("IP Address:  %s\n", ip4addr_ntoa(&ip_info.ip));
-	printf("Subnet mask: %s\n", ip4addr_ntoa(&ip_info.netmask));
-	printf("Gateway:     %s\n", ip4addr_ntoa(&ip_info.gw));	
-	
+    esp_log_level_set("wifi", ESP_LOG_NONE);
 
-	// start the HTTP Server task
+    nvs_flash_init();
+    initialise_wifi();
+    
+    
+    // wait for connection
+    printf("Waiting for connection to the wifi network...\n ");
+    xEventGroupWaitBits(wifi_event_group, WIFI_CONNECTED_BIT, pdFALSE, pdTRUE, portMAX_DELAY);
+    printf("Connected\n\n");
+    
+    // print the local IP address
+    tcpip_adapter_ip_info_t ip_info;
+    ESP_ERROR_CHECK(tcpip_adapter_get_ip_info(TCPIP_ADAPTER_IF_STA, &ip_info));
+    printf("IP Address:  %s\n", ip4addr_ntoa(&ip_info.ip));
+    printf("Subnet mask: %s\n", ip4addr_ntoa(&ip_info.netmask));
+    printf("Gateway:     %s\n", ip4addr_ntoa(&ip_info.gw)); 
+    
+
+    // start the HTTP Server task
     xTaskCreate(&http_server, "http_server", 2048, NULL, 5, NULL);
     xTaskCreate(&task_process_WebSocket, "ws_process_rx", 2048, NULL, 5, NULL);
 
